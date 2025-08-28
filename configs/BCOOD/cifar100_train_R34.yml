@@ -1,0 +1,78 @@
+# ===== 基础配置 =====
+dataset: "CIFAR100"
+backbone: "resnet34"
+pretrained: true
+epochs: 250  # ResNet收敛更快
+batch_size: 128  # ResNet内存效率更高
+
+# ===== ResNet-34 特定配置 =====
+resnet:
+  # ResNet-34架构参数
+  layers: [3, 4, 6, 3]  # ResNet-34层配置
+  zero_init_residual: true
+  groups: 1
+  width_per_group: 64
+  replace_stride_with_dilation: [false, false, false]
+  norm_layer: "BatchNorm2d"
+  
+  # CIFAR适配
+  inplanes: 64
+  dilation: 1
+
+# ===== 特征提取配置 =====
+feature_extraction:
+  use_pretrained: true
+  freeze_backbone: true    # ResNet通常需要冻结
+  freeze_epochs: 100       # 前100轮冻结
+  
+  # 特征维度配置
+  feature_dim: 512         # ResNet-34最终特征维度
+  projection_dim: 256
+  
+  # 特征处理
+  use_attention: true      # ResNet受益于注意力机制
+  attention_type: "cbam"   # Convolutional Block Attention Module
+
+# ===== BCBOOD参数调整 =====
+bcbood:
+  # ResNet特征不同，需要调整参数
+  lambda_reg: 0.15
+  lambda_dood1: 0.12
+  lambda_dood2: 0.12
+  
+  # FGSM扰动参数
+  fgsm_epsilon: 0.035
+  epsilon_std: 0.012
+  
+  # 潜在空间配置
+  latent_dim: 512          # ResNet需要更大的潜在空间
+  tau: 0.15
+
+# ===== 优化器配置 =====
+optimizer:
+  backbone:
+    lr: 0.00005           # 冻结时学习率更小
+    weight_decay: 0.0001
+  generator:
+    lr: 0.0003            # 生成器可以更大学习率
+  discriminator:
+    lr: 0.0003
+
+# ===== 训练策略 =====
+training:
+  # ResNet内存效率更好
+  gradient_checkpointing: false
+  use_amp: true
+  
+  # 学习率
+  scheduler:
+    type: "MultiStepLR"
+    milestones: [100, 200]
+    gamma: 0.1
+
+# ===== 数据增强 =====
+augmentation:
+  # ResNet对增强更鲁棒
+  color_jitter: 0.2
+  random_erase: true
+  erase_prob: 0.25

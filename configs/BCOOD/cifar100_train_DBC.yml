@@ -1,0 +1,73 @@
+# ===== 基础配置 =====
+dataset: "CIFAR100"
+backbone: "densenet_bc"
+pretrained: true
+epochs: 300
+batch_size: 64
+
+# ===== DenseNet-BC 特定配置 =====
+densenet:
+  growth_rate: 12
+  block_config: (16, 16, 16)  # 对于CIFAR-100的简化配置
+  num_init_features: 24
+  bn_size: 4
+  drop_rate: 0.2
+  compression: 0.5
+  memory_efficient: false
+
+# ===== 特征提取配置 =====
+feature_extraction:
+  use_pretrained: true
+  freeze_backbone: false  # 是否冻结backbone权重
+  freeze_epochs: 50       # 前50轮冻结backbone
+  
+  # 特征维度配置
+  feature_dim: 342        # DenseNet-BC的特征维度
+  projection_dim: 256     # 投影头输出维度
+  
+  # 特征归一化
+  use_batch_norm: true
+  use_layer_norm: false
+
+# ===== BCBOOD参数调整 =====
+bcbood:
+  # DenseNet特征密集，需要调整正则化
+  lambda_reg: 0.12
+  lambda_dood1: 0.1
+  lambda_dood2: 0.1
+  
+  # FGSM扰动参数
+  fgsm_epsilon: 0.032
+  epsilon_std: 0.011
+  
+  # 潜在空间配置
+  latent_dim: 256
+  tau: 0.18  # DenseNet特征更密集，需要更高阈值
+
+# ===== 优化器配置 =====
+optimizer:
+  backbone:
+    lr: 0.0001           # backbone较小学习率
+    weight_decay: 0.0005
+  generator:
+    lr: 0.0002
+  discriminator:
+    lr: 0.0002
+
+# ===== 训练策略 =====
+training:
+  # DenseNet需要更多内存
+  gradient_checkpointing: true
+  use_amp: true
+  
+  # 学习率
+  scheduler:
+    type: "CosineAnnealingLR"
+    t_max: 300
+    eta_min: 0.00001
+
+# ===== 数据增强 =====
+augmentation:
+  # DenseNet对增强更敏感
+  color_jitter: 0.15
+  autoaugment: true
