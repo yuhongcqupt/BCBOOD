@@ -237,7 +237,8 @@ The evaluation for other methods used in the experiments is similar—simply cha
 
 
 
-**Please cite this manuscript when using the associated code, which is directly related to a manuscript submitted to The Visual Computer. We will release it as soon as the paper is published.**
+**Please cite this manuscript when using the associated code, which is directly related to a manuscript submitted to The Visual Computer. As soon as the paper is published, we will release it in full.**
 
 
 Reference Yan Xian, Hongru Chen, Ke Liu, Hong Yu. Enhancing Out-of-Distribution Detection via Boundary-Constrained Generative Adversarial Networks. The Visual Computer, 2025.
+
